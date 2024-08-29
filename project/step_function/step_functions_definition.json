@@ -1,13 +1,14 @@
 {
-  "StartAt": "DataSerialization",
+  "Comment": "A description of my state machine",
+  "StartAt": "data-serialization",
   "States": {
-    "DataSerialization": {
+    "data-serialization": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:us-east-1:411941171537:function:serializeImageData:$LATEST",
-        "Payload.$": "$"
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-east-1:411941171537:function:data-serialization:$LATEST"
       },
       "Retry": [
         {
@@ -17,14 +18,14 @@
             "Lambda.SdkClientException",
             "Lambda.TooManyRequestsException"
           ],
-          "IntervalSeconds": 2,
-          "MaxAttempts": 6,
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
           "BackoffRate": 2
         }
       ],
-      "Next": "ClassifyImage"
+      "Next": "classification"
     },
-    "ClassifyImage": {
+    "classification": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
@@ -40,20 +41,20 @@
             "Lambda.SdkClientException",
             "Lambda.TooManyRequestsException"
           ],
-          "IntervalSeconds": 2,
-          "MaxAttempts": 6,
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
           "BackoffRate": 2
         }
       ],
-      "Next": "FilterInference"
+      "Next": "filter-inferences"
     },
-    "FilterInference": {
+    "filter-inferences": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:us-east-1:411941171537:function:inference:$LATEST"
+        "FunctionName": "arn:aws:lambda:us-east-1:411941171537:function:filter-inferences:$LATEST"
       },
       "Retry": [
         {
@@ -63,8 +64,8 @@
             "Lambda.SdkClientException",
             "Lambda.TooManyRequestsException"
           ],
-          "IntervalSeconds": 2,
-          "MaxAttempts": 6,
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
           "BackoffRate": 2
         }
       ],
